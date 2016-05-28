@@ -56,5 +56,5 @@ MULT_DIV_DELIMITER: '*'
 NEWLINE:  '\r'? '\n'
     ;
 
-WS:   (' '|'\t')+ { skip(); }
+WS:   (' '|'\t')+ -> skip
     ;
