@@ -5,6 +5,13 @@ class Value(object):
     def __init__(self, val_type, value):
         self.type = val_type
         self.value = value
+ 
+    @property
+    def real_value(self):
+        if self.type == 'int':
+            return int(self.value)
+        elif self.type == 'double':
+            return float(self.value)
 
 
 class Listener(YailListener.YailListener):     
@@ -70,3 +77,41 @@ class Listener(YailListener.YailListener):
             self.variables[var_name].value = x
         else:
             raise Exception('Variable %s not declared' % var_name)
+
+    def exitPlus_minus(self, ctx):
+        value1 = self.values_stack.pop()
+        value2 = self.values_stack.pop()
+
+        sign = ctx.ADD_MINUS_DELIMITER().getText()
+
+        if value1.type == value2.type:
+            if sign == '+':
+                new_value = Value(val_type=value1.type,
+                                  value=str(value1.real_value + value2.real_value))
+            else: # '-'
+                new_value = Value(val_type=value1.type,
+                                  value=str(value1.real_value - value2.real_value))
+
+            self.values_stack.append(new_value)
+
+        else:
+            raise Exception('Aritmetic operation type mismatch')
+
+    def exitMult_div(self, ctx):
+        value1 = self.values_stack.pop()
+        value2 = self.values_stack.pop()
+
+        sign = ctx.MULT_DIV_DELIMITER().getText()
+
+        if value1.type == value2.type:
+            if sign == '*':
+                new_value = Value(val_type=value1.type,
+                                  value=str(value1.real_value * value2.real_value))
+            else: # '/'
+                new_value = Value(val_type=value1.type,
+                                  value=str(value1.real_value / value2.real_value))
+
+            self.values_stack.append(new_value)
+
+        else:
+            raise Exception('Aritmetic operation type mismatch')
